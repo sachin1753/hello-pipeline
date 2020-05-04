@@ -1,24 +1,30 @@
 pipeline
 {
-agent any
-stages
-{
- stage ('please download code')
-{
-   steps
-{
-     sh 'echo download load'
-}
-}
+	agent any
+	stages
+	{
+		
+		stage ('scm checkout')
+		{
+			steps
+			{
+				git branch: 'master', url: 'https://github.com/sachin1753/hello-pipeline'
+			}
 
- stage ('test the code') {
-   steps { sh 'echo testing done' }}
+		}
+	
 
- stage ('build the code') {
-    steps { sh 'echo war file created' }}
- stage ('deploy test env') {
-    steps { sh 'echo deploying test env' }}
- 
-}
-}
+		stage ('list s3 bucket')
+		{
+			steps
+			{
+				withCredentials([usernameColonPassword(credentialsId: 'aws-key', variable: '')]) {
+				    AWS("--region=us-east-1 s3 ls")
+				}
+			}
 
+		}
+		
+
+	}
+}
